@@ -6,6 +6,7 @@ import type { PageRect } from '#/components/PdfViewer'
 import { ICONS, Icon, PlayerBar, RATES } from '#/components/PlayerBar'
 import { WakeLockNotice, canKeepAwake } from '#/components/WakeLockNotice'
 import { boxStyle, gutterStyle, showsWord, useSettings, wordStyle } from '#/lib/settings'
+import { formatTime } from '#/lib/format'
 import { load, store } from '#/lib/storage'
 import type { Chapter, Paragraph, Progress } from '#/lib/types'
 import { useActiveWord, useWords } from '#/lib/useWords'
@@ -219,6 +220,8 @@ function Reader() {
     return i >= 0 && time < paragraphs[i].end + 1 ? i : -1
   }, [chapters, chapterIdx, paragraphs, time])
   const active: Paragraph | undefined = paragraphs[activeIdx]
+  // Listening time left in the current chapter, at the current speed.
+  const chapterLeft = chapters[chapterIdx] ? Math.max(0, chapters[chapterIdx].end - time) / rate : null
   // Which page segment of the active paragraph is being read (paragraphs can span a page break).
   const activeSeg = useMemo(() => {
     if (!active) return 0
@@ -622,6 +625,14 @@ function Reader() {
           </button>
         )}
         <WakeLockNotice playing={playing} />
+        {fullscreen && chapterLeft != null && (
+          <div
+            className={`pointer-events-none absolute bottom-3 left-3 hidden h-10 items-center rounded-full px-4 text-sm text-zinc-300 tabular-nums shadow-lg shadow-black/40 ring-1 ring-white/10 backdrop-blur pointer-coarse:flex ${uiHidden ? 'bg-zinc-900/50 opacity-60' : 'bg-zinc-900/90'}`}
+            title="Time left in this chapter"
+          >
+            {formatTime(chapterLeft)} left in chapter
+          </div>
+        )}
         {fullscreen && (
           <div className="absolute right-3 bottom-3 hidden items-center gap-2 pointer-coarse:flex">
             {/* With the player bar hidden, play/pause stays in reach. */}
