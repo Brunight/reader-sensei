@@ -625,41 +625,43 @@ function Reader() {
           </button>
         )}
         <WakeLockNotice playing={playing} />
-        {fullscreen && chapterLeft != null && (
-          <div
-            className={`pointer-events-none absolute bottom-3 left-3 hidden h-10 items-center rounded-full px-4 text-sm text-zinc-300 tabular-nums shadow-lg shadow-black/40 ring-1 ring-white/10 backdrop-blur pointer-coarse:flex ${uiHidden ? 'bg-zinc-900/50 opacity-60' : 'bg-zinc-900/90'}`}
-            title="Time left in this chapter"
-          >
-            {formatTime(chapterLeft)} left in chapter
-          </div>
-        )}
         {fullscreen && (
-          <div className="absolute right-3 bottom-3 hidden items-center gap-2 pointer-coarse:flex">
-            {/* With the player bar hidden, play/pause stays in reach. */}
-            {uiHidden && (
+          <div className="absolute right-3 bottom-3 hidden flex-col items-end gap-2 pointer-coarse:flex">
+            {chapterLeft != null && (
+              <div
+                className={`pointer-events-none text-sm text-zinc-200 tabular-nums drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ${uiHidden ? 'opacity-80' : ''}`}
+                title="Time left in this chapter"
+              >
+                -{formatTime(chapterLeft)}
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              {/* With the player bar hidden, play/pause stays in reach. */}
+              {uiHidden && (
+                <button
+                  type="button"
+                  onClick={toggle}
+                  title={playing ? 'Pause' : 'Play'}
+                  className={`${focusBtn} bg-zinc-900/50 opacity-60`}
+                >
+                  <Icon d={playing ? ICONS.pause : ICONS.play} />
+                </button>
+              )}
               <button
                 type="button"
-                onClick={toggle}
-                title={playing ? 'Pause' : 'Play'}
-                className={`${focusBtn} bg-zinc-900/50 opacity-60`}
+                onClick={() => setUiHidden((h) => !h)}
+                title={uiHidden ? 'Show controls' : 'Hide controls'}
+                className={`${focusBtn} ${uiHidden ? 'bg-zinc-900/50 opacity-60' : 'bg-zinc-900/90'}`}
               >
-                <Icon d={playing ? ICONS.pause : ICONS.play} />
+                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+                  {uiHidden ? (
+                    <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Zm9.5 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                  ) : (
+                    <path d="M3 3l18 18M10.6 5.6A9.9 9.9 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3 3.8M6.4 6.9A17.6 17.6 0 0 0 2.5 12S6 18.5 12 18.5a9.4 9.4 0 0 0 4.3-1M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+                  )}
+                </svg>
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => setUiHidden((h) => !h)}
-              title={uiHidden ? 'Show controls' : 'Hide controls'}
-              className={`${focusBtn} ${uiHidden ? 'bg-zinc-900/50 opacity-60' : 'bg-zinc-900/90'}`}
-            >
-              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-                {uiHidden ? (
-                  <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Zm9.5 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                ) : (
-                  <path d="M3 3l18 18M10.6 5.6A9.9 9.9 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3 3.8M6.4 6.9A17.6 17.6 0 0 0 2.5 12S6 18.5 12 18.5a9.4 9.4 0 0 0 4.3-1M9.9 9.9a3 3 0 0 0 4.2 4.2" />
-                )}
-              </svg>
-            </button>
+            </div>
           </div>
         )}
       </div>
