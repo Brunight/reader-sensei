@@ -1,4 +1,5 @@
 import { formatTime } from '#/lib/format'
+import { useSettings } from '#/lib/settings'
 import type { Chapter } from '#/lib/types'
 
 export const RATES = [0.75, 1, 1.1, 1.15, 1.25, 1.5, 1.75, 2, 2.5]
@@ -9,6 +10,7 @@ interface Props {
   playing: boolean
   rate: number
   chapters: Chapter[]
+  chapterIdx: number
   onToggle: () => void
   onSeek: (time: number) => void
   onSkip: (delta: number) => void
@@ -35,14 +37,33 @@ export const ICONS = {
 
 const btn = 'grid place-items-center rounded-full text-zinc-300 hover:bg-white/10 hover:text-white active:scale-95'
 
-export function PlayerBar({ time, duration, playing, rate, chapters, onToggle, onSeek, onSkip, onParagraph, onRate }: Props) {
+export function PlayerBar({
+  time,
+  duration,
+  playing,
+  rate,
+  chapters,
+  chapterIdx,
+  onToggle,
+  onSeek,
+  onSkip,
+  onParagraph,
+  onRate,
+}: Props) {
   const nextRate = () => onRate(RATES[(RATES.indexOf(rate) + 1) % RATES.length] ?? 1)
+  // The span the seek bar and times cover: the whole book, or just the current chapter.
+  const chapter = useSettings().seekScope === 'chapter' ? chapters[chapterIdx] : undefined
+  const start = chapter?.start ?? 0
+  const end = chapter ? Math.min(chapter.end, duration || chapter.end) : duration
+  const length = Math.max(0, end - start)
+  const elapsed = Math.max(0, Math.min(time - start, length))
 
   return (
     <div className="border-t border-white/10 bg-zinc-950/95 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
       <div className="mx-auto max-w-3xl">
         <div className="relative h-5">
-          {duration > 0 &&
+          {!chapter &&
+            duration > 0 &&
             chapters.slice(1).map((c, i) => (
               <span
                 key={i}
@@ -53,17 +74,19 @@ export function PlayerBar({ time, duration, playing, rate, chapters, onToggle, o
           <input
             type="range"
             min={0}
-            max={duration || 1}
+            max={length || 1}
             step={1}
-            value={Math.min(time, duration || 1)}
-            onChange={(e) => onSeek(Number(e.target.value))}
-            aria-label="Seek"
+            value={elapsed}
+            onChange={(e) => onSeek(start + Number(e.target.value))}
+            aria-label={chapter ? 'Seek in chapter' : 'Seek'}
             className="absolute inset-0 h-5 w-full cursor-pointer accent-amber-400"
           />
         </div>
         <div className="flex justify-between text-xs text-zinc-500 tabular-nums">
-          <span>{formatTime(time)}</span>
-          <span title="Remaining at current speed">-{formatTime((duration - time) / rate)}</span>
+          <span>{formatTime(elapsed)}</span>
+          <span title={`Remaining in ${chapter ? 'chapter' : 'book'} at current speed`}>
+            -{formatTime((length - elapsed) / rate)}
+          </span>
         </div>
         <div className="mt-1 flex items-center gap-2">
           <span className="w-12" />

@@ -11,7 +11,7 @@ import {
   useSettings,
   wordStyle,
 } from '#/lib/settings'
-import type { HighlightColor, HighlightMode, HighlightStyle, Settings } from '#/lib/settings'
+import type { HighlightColor, HighlightMode, HighlightStyle, SeekScope, Settings } from '#/lib/settings'
 import { MAX_NAME_LENGTH, cleanName, fetchMe, setMyName } from '#/server/fns'
 import type { Me } from '#/server/fns'
 
@@ -34,6 +34,11 @@ const MODES: { value: HighlightMode; label: string }[] = [
 const STYLES: { value: HighlightStyle; label: string; hint: string }[] = [
   { value: 'box', label: 'Box', hint: 'Tinted box around the paragraph' },
   { value: 'gutter', label: 'Gutter', hint: 'Bar in the left margin' },
+]
+
+const SEEK_SCOPES: { value: SeekScope; label: string }[] = [
+  { value: 'book', label: 'Whole book' },
+  { value: 'chapter', label: 'Current chapter' },
 ]
 
 const SAMPLE = [
@@ -144,6 +149,33 @@ function SettingsPage() {
             <ColorControls label="Word" value={settings.word} onChange={(word) => update({ word })} />
           </section>
         )}
+
+        <section>
+          <h2 className="text-base font-semibold">Seek bar</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            What the player’s seek bar and times cover. Saved on this device.
+          </p>
+          <div
+            className="mt-4 grid grid-cols-2 gap-1 rounded-lg bg-white/5 p-1 ring-1 ring-white/10"
+            role="radiogroup"
+            aria-label="Seek bar span"
+          >
+            {SEEK_SCOPES.map((m) => (
+              <button
+                key={m.value}
+                type="button"
+                role="radio"
+                aria-checked={settings.seekScope === m.value}
+                onClick={() => update({ seekScope: m.value })}
+                className={`rounded-md py-2 text-sm font-medium transition ${
+                  settings.seekScope === m.value ? 'bg-amber-400 text-zinc-950' : 'text-zinc-300 hover:bg-white/5'
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </section>
 
         <button
           type="button"

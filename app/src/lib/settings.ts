@@ -5,6 +5,8 @@ import { load, store } from './storage'
 export type HighlightStyle = 'box' | 'gutter'
 /** What follows the narration: the paragraph, the word being spoken, or both. */
 export type HighlightMode = 'paragraph' | 'word' | 'both'
+/** What the player bar's seek bar and times span. */
+export type SeekScope = 'book' | 'chapter'
 
 export interface HighlightColor {
   /** #rrggbb */
@@ -20,6 +22,7 @@ export interface Settings {
   box: HighlightColor
   gutter: HighlightColor
   word: HighlightColor
+  seekScope: SeekScope
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -28,6 +31,7 @@ export const DEFAULT_SETTINGS: Settings = {
   box: { color: '#fbbf24', opacity: 0.12 },
   gutter: { color: '#fbbf24', opacity: 0.9 },
   word: { color: '#fbbf24', opacity: 0.35 },
+  seekScope: 'book',
 }
 
 const KEY = 'settings'
@@ -41,6 +45,7 @@ function read(): Settings {
     box: { ...DEFAULT_SETTINGS.box, ...saved.box },
     gutter: { ...DEFAULT_SETTINGS.gutter, ...saved.gutter },
     word: { ...DEFAULT_SETTINGS.word, ...saved.word },
+    seekScope: saved.seekScope === 'chapter' ? 'chapter' : 'book',
   }
 }
 

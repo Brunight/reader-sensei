@@ -673,6 +673,7 @@ function Reader() {
           playing={playing}
           rate={rate}
           chapters={chapters}
+          chapterIdx={chapterIdx}
           onToggle={toggle}
           onSeek={seek}
           onSkip={skip}
