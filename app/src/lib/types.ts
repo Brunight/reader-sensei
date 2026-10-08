@@ -47,6 +47,8 @@ export interface BookSummary {
   duration: number | null
   hasCover: boolean
   progress: number | null
+  /** When this user's position was last saved (ISO). */
+  lastReadAt: string | null
 }
 
 export interface SeriesSummary {

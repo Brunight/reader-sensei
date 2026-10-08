@@ -129,14 +129,18 @@ export async function listBooks(user: AppUser): Promise<SeriesSummary[]> {
     for (const volume of await listSubdirs(path.join(BOOKS_DIR, series))) {
       const book = await scanBook(series, volume)
       if (!book) continue
-      volumes.push(await summarize(book, progress[book.id]?.time))
+      volumes.push(await summarize(book, progress[book.id]?.time, progress[book.id]?.updatedAt))
     }
     if (volumes.length) result.push({ id: series, name: displayName(series), volumes })
   }
   return result
 }
 
-export async function summarize(book: BookFiles, time: number | undefined): Promise<BookSummary> {
+export async function summarize(
+  book: BookFiles,
+  time: number | undefined,
+  lastReadAt?: string,
+): Promise<BookSummary> {
   const sync = await readSync(book).catch(() => null)
   return {
     id: book.id,
@@ -147,5 +151,6 @@ export async function summarize(book: BookFiles, time: number | undefined): Prom
     duration: sync?.duration ?? null,
     hasCover: book.cover !== null,
     progress: sync && time != null ? Math.min(1, time / sync.duration) : null,
+    lastReadAt: lastReadAt ?? null,
   }
 }
